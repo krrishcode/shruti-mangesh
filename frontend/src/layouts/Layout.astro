@@ -1,0 +1,29 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'MANGESH MAHADEV | Haute Couture & Heritage Menswear',
+  description = 'Discover handcrafted royal Sherwanis, Imperial Bandhgalas, Heritage Kurta Sets, and Bespoke Groomswear from the atelier of Mangesh Mahadev.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth bg-[#FAF8F5]">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+
+  </head>
+  <body class="bg-[#FAF8F5] text-[#333333] antialiased selection:bg-[#4A0E17] selection:text-white" style="font-family: 'Franklin Gothic', sans-serif;">
+    <slot />
+  </body>
+</html>

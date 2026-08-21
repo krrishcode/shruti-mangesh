@@ -1,0 +1,42 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { HeaderInteractive } from '../../components/HeaderInteractive';
+import { ShopListingView } from '../../components/ShopListingView';
+import Footer from '../../components/Footer.astro';
+
+export async function getStaticPaths() {
+  const categoryMap: { [slug: string]: string } = {
+    'sherwanis': 'Sherwanis',
+    'bandhgalas': 'Bandhgalas',
+    'kurtas': 'Kurtas',
+    'nehru-jackets': 'Nehru Jackets',
+    'bottoms': 'Bottoms',
+    'accessories': 'Accessories',
+  };
+
+  return Object.entries(categoryMap).map(([slug, categoryName]) => ({
+    params: { category: slug },
+    props: { categoryName, slug },
+  }));
+}
+
+interface Props {
+  categoryName: string;
+  slug: string;
+}
+
+const { categoryName } = Astro.props;
+---
+
+<Layout
+  title={`${categoryName.toUpperCase()} | Mangesh Mahadev Haute Couture`}
+  description={`Discover handcrafted luxury ${categoryName} designed for royal celebrations and wedding ceremonies.`}
+>
+  <HeaderInteractive client:load />
+  
+  <main class="min-h-screen">
+    <ShopListingView initialCategory={categoryName} client:load />
+  </main>
+
+  <Footer />
+</Layout>

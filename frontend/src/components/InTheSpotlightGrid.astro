@@ -1,0 +1,68 @@
+---
+interface SpotlightItem {
+  id: string;
+  title: string;
+  image: string;
+  href: string;
+}
+
+const SPOTLIGHT_ITEMS: SpotlightItem[] = [
+  {
+    id: 'timeless-oxblood',
+    title: 'IMPERIAL OXBLOOD',
+    image: 'https://www.anitadongre.com/dw/image/v2/BGCX_PRD/on/demandware.static/-/Sites-AD-INDIA-Library/default/dwc907ca84/AD_Refresh_Aug_2026/desktop/516X774_1_In_The_Spotlight.jpg',
+    href: '#sherwanis',
+  },
+  {
+    id: 'the-cocktail-edit',
+    title: 'THE COCKTAIL EDIT',
+    image: 'https://www.anitadongre.com/dw/image/v2/BGCX_PRD/on/demandware.static/-/Sites-AD-INDIA-Library/default/dw12b58ee6/AD_Refresh_Aug_2026/desktop/516X774_2_In_The_Spotlight.jpg',
+    href: '#blazers',
+  },
+  {
+    id: 'accessories',
+    title: 'ACCESSORIES',
+    image: 'https://www.anitadongre.com/dw/image/v2/BGCX_PRD/on/demandware.static/-/Sites-AD-INDIA-Library/default/dw2ffef29f/AD_Refresh_Aug_2026/desktop/516X774_3_In_The_Spotlight.jpg',
+    href: '#accessories',
+  },
+  {
+    id: 'hand-painted-pichhwai',
+    title: 'HAND PAINTED PICHHWAI',
+    image: 'https://www.anitadongre.com/dw/image/v2/BGCX_PRD/on/demandware.static/-/Sites-AD-INDIA-Library/default/dw4fded07e/AD_Refresh_Aug_2026/desktop/516X774_4_In_The_Spotlight.jpg',
+    href: '#kurtas',
+  },
+];
+---
+
+<section id="spotlight" class="py-20 bg-[#FAF8F5]">
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12">
+    
+    {/* Clean Minimalist Header Matching Anita Dongre */}
+    <div class="text-center max-w-2xl mx-auto mb-12">
+      <h2 class="font-serif-luxury text-3xl sm:text-4xl lg:text-[40px] tracking-[0.14em] text-[#333333] font-light uppercase">
+        IN THE SPOTLIGHT
+      </h2>
+    </div>
+
+    {/* 4-Column Clean Grid with Text Below Image */}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+      {SPOTLIGHT_ITEMS.map((item) => (
+        <a href={item.href} class="group block text-center cursor-pointer">
+          <div class="relative aspect-[3/4.6] overflow-hidden bg-[#ECE8E1] mb-4">
+            <img
+              src={item.image}
+              alt={item.title}
+              loading="lazy"
+              class="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+            />
+          </div>
+
+          <h3 class="font-sans-clean text-[10px] sm:text-[11px] tracking-[0.20em] font-medium text-[#333333] uppercase group-hover:text-[#4A0E17] transition-colors">
+            {item.title}
+          </h3>
+        </a>
+      ))}
+    </div>
+
+  </div>
+</section>

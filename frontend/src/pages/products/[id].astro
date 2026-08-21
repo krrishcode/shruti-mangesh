@@ -1,0 +1,32 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { HeaderInteractive } from '../../components/HeaderInteractive';
+import { ProductDetailView } from '../../components/ProductDetailView';
+import Footer from '../../components/Footer.astro';
+import { MENS_PRODUCTS } from '../../data/mensCollection';
+
+export function getStaticPaths() {
+  return MENS_PRODUCTS.map((prod) => ({
+    params: { id: String(prod.id) },
+    props: { product: prod },
+  }));
+}
+
+const { product } = Astro.props;
+---
+
+<Layout
+  title={`${product.title} | Mangesh Mahadev Haute Couture`}
+  description={product.description}
+>
+  {/* Luxury Navigation Header */}
+  <HeaderInteractive client:load />
+
+  <main id="main">
+    {/* Interactive Product Detail Page Island */}
+    <ProductDetailView client:load product={product} />
+  </main>
+
+  {/* House of Mangesh Mahadev Footer */}
+  <Footer />
+</Layout>

@@ -1,0 +1,62 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { HeaderInteractive } from '../components/HeaderInteractive';
+import { HeroSlider } from '../components/HeroSlider';
+import CategoryGrid from '../components/CategoryGrid.astro';
+import HandsFreeHeartsFull from '../components/HandsFreeHeartsFull.astro';
+import MensWearBanner from '../components/MensWearBanner.astro';
+import { ProductCarousel } from '../components/ProductCarousel';
+import InTheSpotlightGrid from '../components/InTheSpotlightGrid.astro';
+import TwoColEditorial from '../components/TwoColEditorial.astro';
+import { CelebsShowcase } from '../components/CelebsShowcase';
+import MoreToExplore from '../components/MoreToExplore.astro';
+import ScheduleAppointmentBanner from '../components/ScheduleAppointmentBanner.astro';
+import { AppointmentBooking } from '../components/AppointmentBooking';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout
+  title="Buy Mens Designer Clothes, Sherwanis & Bandhgalas Online | Mangesh Mahadev"
+  description="Shop Indian luxury menswear online at Mangesh Mahadev. Explore royal sherwanis, imperial bandhgalas, silk kurta sets, and bespoke groomswear."
+>
+  {/* 1. Header with Promo Ticker, Navigation & Currency Switcher */}
+  <HeaderInteractive client:load />
+
+  <main id="main">
+    {/* 2. Hero Campaign Video / Banner (FW'26) */}
+    <HeroSlider client:load />
+
+    {/* 3. Category Grid: LOVE ALL | FW'26 */}
+    <CategoryGrid />
+
+    {/* 4. HANDS FREE, HEARTS FULL (Carry joy with you) */}
+    <HandsFreeHeartsFull />
+
+    {/* 5. Full-width Menswear Campaign Banner */}
+    <MensWearBanner />
+
+    {/* 6. Product Carousel with < > Navigation & SHOP THE COLLECTION */}
+    <ProductCarousel client:visible />
+
+    {/* 7. IN THE SPOTLIGHT (4-column grid) */}
+    <InTheSpotlightGrid />
+
+    {/* 8. 2-Column Split Layout: Love All, FW'26 */}
+    <TwoColEditorial />
+
+    {/* 9. CELEBS IN MANGESH MAHADEV + SHOP NOW */}
+    <CelebsShowcase client:visible />
+
+    {/* 10. MORE TO EXPLORE (IN THE PRESS, RUNWAY, SUSTAINING CRAFTS) */}
+    <MoreToExplore />
+
+    {/* 11. Full-width SCHEDULE AN APPOINTMENT Banner */}
+    <ScheduleAppointmentBanner />
+
+    {/* 12. VIP Bespoke Atelier Consultation Booking Form */}
+    <AppointmentBooking client:visible />
+  </main>
+
+  {/* 13. Complete Footer: Brand Story + Subscription + 5-Col Sitemap */}
+  <Footer />
+</Layout>

@@ -1,0 +1,10 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { UserPortal } from '../react/user/components/UserPortal';
+---
+
+<Layout title="My Account">
+  <div class="max-w-4xl mx-auto py-12 px-4">
+    <UserPortal client:load />
+  </div>
+</Layout>
