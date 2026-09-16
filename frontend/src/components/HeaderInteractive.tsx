@@ -6,7 +6,6 @@ export const HeaderInteractive: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [currency, setCurrency] = useState<'USD' | 'INR' | 'GBP' | 'EUR'>('USD');
   const [searchQuery, setSearchQuery] = useState('');
 
   const { items, removeItem, updateQuantity, totalPrice, totalItems } = useCartStore();
@@ -19,19 +18,8 @@ export const HeaderInteractive: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const currencies = {
-    USD: { symbol: '$', rate: 1 },
-    INR: { symbol: '₹', rate: 86.5 },
-    GBP: { symbol: '£', rate: 0.79 },
-    EUR: { symbol: '€', rate: 0.92 },
-  };
-
-  const formatPrice = (usdAmount: number) => {
-    const { symbol, rate } = currencies[currency];
-    return `${symbol}${(usdAmount * rate).toLocaleString(undefined, {
-      maximumFractionDigits: 0,
-    })}`;
-  };
+  const formatPrice = (amount: number) =>
+    `₹${Math.round(amount).toLocaleString('en-IN')}`;
 
   const navLinks = [
     { name: 'ALL CLOTHING', href: '/shop' },
@@ -66,17 +54,7 @@ export const HeaderInteractive: React.FC = () => {
 
           {/* Right: Minimal Currency Switcher */}
           <div className="hidden md:flex items-center gap-2 text-[#E6C69C]">
-            <span className="text-[10px] text-[#D8B48B] font-light">CURRENCY:</span>
-            <select
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value as any)}
-              className="bg-transparent text-white text-[10.5px] font-medium focus:outline-none cursor-pointer tracking-wider"
-            >
-              <option value="USD" className="text-black">USD ($)</option>
-              <option value="INR" className="text-black">INR (₹)</option>
-              <option value="GBP" className="text-black">GBP (£)</option>
-              <option value="EUR" className="text-black">EUR (€)</option>
-            </select>
+            <span className="text-[10px] text-[#D8B48B] font-light">INR (₹)</span>
           </div>
         </div>
       </div>
@@ -154,7 +132,7 @@ export const HeaderInteractive: React.FC = () => {
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center justify-center gap-8 mt-5 pt-3 border-t border-gray-100 text-[11px] tracking-[0.20em] font-medium text-[#2E2E2E]">
+          <nav className="hidden lg:flex items-center justify-center gap-8 pt-3 border-t border-gray-100 text-[11px] tracking-[0.20em] font-medium text-[#2E2E2E]">
             {navLinks.map((link) => (
               <a
                 key={link.name}

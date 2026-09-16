@@ -1,7 +1,0 @@
-packages:
-  - 'frontend'
-  - 'hono'
-  - 'packages/*'
-allowBuilds:
-  esbuild: true
-  sharp: true

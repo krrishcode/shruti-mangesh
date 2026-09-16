@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { HeaderInteractive } from '../components/HeaderInteractive';
+import Footer from '../components/Footer.astro';
+import { RegisterPage } from '../react/auth/pages/RegisterPage';
+---
+<Layout title="Create Account | Mangesh Mahadev">
+  <HeaderInteractive client:load />
+  <RegisterPage client:load />
+  <Footer />
+</Layout>

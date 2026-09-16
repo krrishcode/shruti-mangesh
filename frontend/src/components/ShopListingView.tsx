@@ -12,7 +12,7 @@ export const ShopListingView: React.FC<ShopListingViewProps> = ({ initialCategor
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedCrafts, setSelectedCrafts] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 400000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500000]);
   const [onlyReadyToShip, setOnlyReadyToShip] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<string>('relevant');
   
@@ -82,7 +82,7 @@ export const ShopListingView: React.FC<ShopListingViewProps> = ({ initialCategor
     setSelectedColors([]);
     setSelectedSizes([]);
     setSelectedCrafts([]);
-    setPriceRange([0, 400000]);
+    setPriceRange([0, 500000]);
     setOnlyReadyToShip(false);
   };
 
@@ -133,8 +133,8 @@ export const ShopListingView: React.FC<ShopListingViewProps> = ({ initialCategor
         );
         if (!matchesCraft) return false;
       }
-      // Price (Rupee calculation)
-      const inrPrice = product.price * 86.5;
+      // Price (already in INR)
+      const inrPrice = product.price;
       if (inrPrice < priceRange[0] || inrPrice > priceRange[1]) {
         return false;
       }
@@ -144,8 +144,8 @@ export const ShopListingView: React.FC<ShopListingViewProps> = ({ initialCategor
       }
       return true;
     }).sort((a, b) => {
-      const priceA = a.price * 86.5;
-      const priceB = b.price * 86.5;
+      const priceA = a.price;
+      const priceB = b.price;
       if (sortBy === 'price-low') return priceA - priceB;
       if (sortBy === 'price-high') return priceB - priceA;
       if (sortBy === 'newest') return parseInt(b.id) - parseInt(a.id);
@@ -159,7 +159,7 @@ export const ShopListingView: React.FC<ShopListingViewProps> = ({ initialCategor
     selectedSizes.length +
     selectedCrafts.length +
     (onlyReadyToShip ? 1 : 0) +
-    (priceRange[1] < 400000 ? 1 : 0);
+    (priceRange[1] < 500000 || priceRange[0] > 0 ? 1 : 0);
 
   return (
     <div className="bg-[#FAF8F5] text-[#333333] min-h-screen pt-4 pb-20">
@@ -466,7 +466,8 @@ export const ShopListingView: React.FC<ShopListingViewProps> = ({ initialCategor
                   {/* Product Title */}
                   <a
                     href={`/products/${product.id}`}
-                    className="font-serif-luxury text-sm sm:text-[15px] font-normal tracking-[0.1em] text-[#333333] hover:text-[#4A0E17] transition-colors uppercase line-clamp-1 block"
+                    className="font-serif-luxury text-[13px] font-normal tracking-[0.08em] text-[#333333] hover:text-[#4A0E17] transition-colors uppercase block w-full h-[18px] overflow-hidden text-ellipsis whitespace-nowrap"
+                    title={product.title}
                   >
                     {product.title}
                   </a>
@@ -475,9 +476,6 @@ export const ShopListingView: React.FC<ShopListingViewProps> = ({ initialCategor
                   <div className="mt-1 flex items-baseline justify-center gap-2">
                     <span className="font-serif-luxury text-sm sm:text-base font-semibold text-[#333333]">
                       ₹{inrPrice.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                    </span>
-                    <span className="font-sans-clean text-[10.5px] text-gray-500 font-light">
-                      (${product.price.toLocaleString()} USD)
                     </span>
                   </div>
 
@@ -580,7 +578,7 @@ export const ShopListingView: React.FC<ShopListingViewProps> = ({ initialCategor
                     <input
                       type="range"
                       min="0"
-                      max="400000"
+                      max="500000"
                       step="10000"
                       value={priceRange[1]}
                       onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
@@ -597,13 +595,13 @@ export const ShopListingView: React.FC<ShopListingViewProps> = ({ initialCategor
                         onClick={() => setPriceRange([50000, 150000])}
                         className="px-2.5 py-1 text-[11px] border border-gray-300 bg-white hover:border-[#4A0E17]"
                       >
-                        ₹50k – ₹150k
+                        ₹50k – ₹1.5L
                       </button>
                       <button
-                        onClick={() => setPriceRange([150000, 400000])}
+                        onClick={() => setPriceRange([150000, 500000])}
                         className="px-2.5 py-1 text-[11px] border border-gray-300 bg-white hover:border-[#4A0E17]"
                       >
-                        Above ₹150k
+                        Above ₹1.5L
                       </button>
                     </div>
                   </div>

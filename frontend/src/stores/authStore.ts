@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { UserDto } from '@ecommerce/types';
+import type { UserDto } from '../types';
 
 interface AuthState {
   user: UserDto | null;

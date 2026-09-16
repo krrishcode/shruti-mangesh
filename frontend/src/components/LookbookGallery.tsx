@@ -74,7 +74,7 @@ export const LookbookGallery: React.FC = () => {
               </div>
 
               {/* Minimal Text Below Image */}
-              <h3 className="font-serif-luxury text-sm sm:text-base tracking-[0.10em] text-[#333333] uppercase group-hover:text-[#4A0E17] transition-colors truncate font-normal">
+              <h3 className="font-serif-luxury text-[13px] tracking-[0.08em] text-[#333333] uppercase group-hover:text-[#4A0E17] transition-colors font-normal w-full h-[18px] overflow-hidden text-ellipsis whitespace-nowrap" title={item.title}>
                 {item.title}
               </h3>
               <p className="font-sans-clean text-[10px] sm:text-[11px] text-[#333333] tracking-[0.14em] mt-1 uppercase font-medium">

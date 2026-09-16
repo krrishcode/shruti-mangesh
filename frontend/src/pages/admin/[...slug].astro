@@ -1,0 +1,30 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { AdminApp } from '../../react/admin/AdminApp';
+
+export async function getStaticPaths() {
+  const baseRoutes = [
+    'dashboard',
+    'products',
+    'products/new',
+    'categories',
+    'orders',
+    'payments',
+    'customers',
+    'appointments',
+    'reviews',
+    'settings',
+  ];
+
+  // Edit routes for products up to 100
+  const editRoutes = Array.from({ length: 100 }, (_, i) => `products/edit/${i + 1}`);
+
+  return [...baseRoutes, ...editRoutes].map((slug) => ({
+    params: { slug },
+  }));
+}
+---
+
+<AdminLayout title="Admin Panel | MANGESH MAHADEV">
+  <AdminApp client:load />
+</AdminLayout>

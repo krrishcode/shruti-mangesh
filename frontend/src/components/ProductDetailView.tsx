@@ -9,10 +9,67 @@ interface ProductDetailProps {
 export const ProductDetailView: React.FC<ProductDetailProps> = ({ product: initialProduct }) => {
   const product: MensProduct = initialProduct || MENS_PRODUCTS[0];
 
+  // Color variants support (cloth can have multiple colors with independent size mapping)
+  const colorVariants: Array<{
+    id?: string;
+    color: string;
+    colorHex: string;
+    imageFront?: string;
+    sizes: string[];
+    inStockSizes: string[];
+  }> = (() => {
+    if (product.colorVariants) {
+      try {
+        const parsed = typeof product.colorVariants === 'string'
+          ? JSON.parse(product.colorVariants)
+          : product.colorVariants;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {}
+    }
+    // Default fallback: sample multi-colors for Product 102
+    return [
+      {
+        id: 'var-beige',
+        color: product.color || 'Beige',
+        colorHex: product.colorHex || '#D6C7B2',
+        imageFront: product.imageFront,
+        sizes: ['38', '40', '42', '44', '46', '48'],
+        inStockSizes: ['38', '40', '42', '44', '46'],
+      },
+      {
+        id: 'var-black',
+        color: 'Black',
+        colorHex: '#1C1917',
+        sizes: ['40', '44'],
+        inStockSizes: ['40', '44'],
+      },
+      {
+        id: 'var-blue',
+        color: 'Royal Blue',
+        colorHex: '#1E3A8A',
+        sizes: ['38', '40'],
+        inStockSizes: ['38'],
+      },
+    ];
+  })();
+
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [selectedColor, setSelectedColor] = useState(colorVariants[0]?.color || product.color || 'Beige');
   const [selectedSize, setSelectedSize] = useState('38');
-  const [selectedColor, setSelectedColor] = useState(product.color || 'Off White');
-  const [deliveryMethod, setDeliveryMethod] = useState<'home' | 'pickup'>('home');
+
+  const activeVariant = colorVariants.find(
+    v => v.color.toLowerCase() === selectedColor.toLowerCase()
+  ) || colorVariants[0];
+
+  const numericSizes = (activeVariant?.sizes || ['38', '40', '42', '44', '46', '48']).map((s) => ({
+    label: s,
+    inStock: (activeVariant?.inStockSizes || []).includes(s),
+  }));
+
+  const productDeliveryOption = (product.deliveryMethod as string) || 'both';
+  const canHome = productDeliveryOption === 'both' || productDeliveryOption === 'home';
+  const canPickup = productDeliveryOption === 'both' || productDeliveryOption === 'pickup';
+  const [deliveryMethod, setDeliveryMethod] = useState<'home' | 'pickup'>(canHome ? 'home' : 'pickup');
   const [isWishlist, setIsWishlist] = useState(false);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   
@@ -28,21 +85,26 @@ export const ProductDetailView: React.FC<ProductDetailProps> = ({ product: initi
 
   const { addItem } = useCartStore();
 
-  const galleryImages = [
-    product.imageFront,
-    product.imageDetail,
-    'https://www.anitadongre.com/dw/image/v2/BGCX_PRD/on/demandware.static/-/Sites-masterCatalog_AD_India/default/dw67b07f8a/images/hires/FW26/F26MP32J_OFF%20WHITE_1.jpg?sw=1400&sh=2100&sm=fit&strip=false',
-    'https://www.anitadongre.com/dw/image/v2/BGCX_PRD/on/demandware.static/-/Sites-masterCatalog_AD_India/default/dw1b754ca9/images/hires/FW26/F26MP6J_GOLD_1.jpg?sw=1400&sh=2100&sm=fit&strip=false',
-  ];
+  const handleColorChange = (newColor: string) => {
+    setSelectedColor(newColor);
+    const targetVariant = colorVariants.find(v => v.color.toLowerCase() === newColor.toLowerCase());
+    if (targetVariant && targetVariant.sizes && !targetVariant.sizes.includes(selectedSize)) {
+      const firstInStock = targetVariant.sizes.find(s => targetVariant.inStockSizes.includes(s));
+      setSelectedSize(firstInStock || targetVariant.sizes[0] || '38');
+    }
+  };
 
-  const numericSizes = [
-    { label: '38', inStock: true },
-    { label: '40', inStock: false }, // Out of stock with diagonal slash
-    { label: '42', inStock: true },
-    { label: '44', inStock: true },
-    { label: '46', inStock: true },
-    { label: '48', inStock: true },
-  ];
+  const galleryImages = (Array.isArray(product.gallery) && product.gallery.length > 0)
+    ? [
+        activeVariant?.imageFront || product.imageFront,
+        ...product.gallery.filter(img => img !== (activeVariant?.imageFront || product.imageFront))
+      ].filter(Boolean) as string[]
+    : [
+        activeVariant?.imageFront || product.imageFront,
+        product.imageDetail,
+        'https://www.anitadongre.com/dw/image/v2/BGCX_PRD/on/demandware.static/-/Sites-masterCatalog_AD_India/default/dw67b07f8a/images/hires/FW26/F26MP32J_OFF%20WHITE_1.jpg?sw=1400&sh=2100&sm=fit&strip=false',
+        'https://www.anitadongre.com/dw/image/v2/BGCX_PRD/on/demandware.static/-/Sites-masterCatalog_AD_India/default/dw1b754ca9/images/hires/FW26/F26MP6J_GOLD_1.jpg?sw=1400&sh=2100&sm=fit&strip=false',
+      ].filter(Boolean) as string[];
 
   const relatedProducts = MENS_PRODUCTS.filter((p) => p.id !== product.id).slice(0, 4);
 
@@ -148,9 +210,16 @@ Mangesh Mahadev
 
               {/* Price & Taxes */}
               <div className="mt-3">
-                <span className="font-serif-luxury text-2xl sm:text-3xl font-normal text-[#333333] tracking-wider">
-                  ₹{(product.price * 86.5).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                </span>
+                <div className="flex items-baseline gap-3">
+                  <span className="font-serif-luxury text-2xl sm:text-3xl font-normal text-[#333333] tracking-wider">
+                    ₹{product.price.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                  </span>
+                  {product.salePrice && product.salePrice < product.price && (
+                    <span className="font-serif-luxury text-lg sm:text-xl text-[#888] line-through">
+                      ₹{product.salePrice.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                    </span>
+                  )}
+                </div>
                 <p className="font-sans-clean text-[11px] text-[#333333] font-light tracking-[0.14em] uppercase mt-1">
                   MRP Inclusive of all taxes
                 </p>
@@ -159,26 +228,48 @@ Mangesh Mahadev
 
             {/* Editorial Storytelling in Poetic Story Serif */}
             <div className="space-y-3 font-serif-story text-[13.5px] sm:text-[14.5px] text-[#3A3A3A] leading-relaxed font-light">
-              <p>
-                "Zardozi has existed in India since the time of the Rig Veda and reached its peak under Mughal patronage. A form of metal-thread embroidery whose name comes from two Urdu words — zar, meaning gold, and doz, meaning hand-work or embroidery. Once used to enrich the attire of kings, its floral motifs worked in gold and soft-coloured thread were drawn from Mughal court paintings & dressed generations of nobility."
-              </p>
-              <p>
-                "Our {product.title} from the Love All F/W 2026 collection is an expression of soft florals in a sovereign garden. Zardozi's gold-thread work has always had this quality of quiet indulgence, its motifs catching the light, glowing softly. Finished by master artisans in threadwork & French knots, this silk ensemble comes tailored with imperial poise."
-              </p>
+              {product.editorialStory ? (
+                product.editorialStory.split('\n\n').map((paragraph, idx) => (
+                  <p key={idx}>"{paragraph}"</p>
+                ))
+              ) : (
+                <>
+                  <p>
+                    "Zardozi has existed in India since the time of the Rig Veda and reached its peak under Mughal patronage. A form of metal-thread embroidery whose name comes from two Urdu words — zar, meaning gold, and doz, meaning hand-work or embroidery. Once used to enrich the attire of kings, its floral motifs worked in gold and soft-coloured thread were drawn from Mughal court paintings & dressed generations of nobility."
+                  </p>
+                  <p>
+                    "Our {product.title} from the Love All F/W 2026 collection is an expression of soft florals in a sovereign garden. Zardozi's gold-thread work has always had this quality of quiet indulgence, its motifs catching the light, glowing softly. Finished by master artisans in threadwork & French knots, this silk ensemble comes tailored with imperial poise."
+                  </p>
+                </>
+              )}
             </div>
 
             {/* Colour Section */}
             <div className="pt-2">
               <div className="flex items-center gap-4">
                 <span className="font-sans-clean text-[11px] text-[#222222] font-medium tracking-[0.14em] uppercase">Colour:</span>
-                <div className="p-0.5 rounded-full border border-gray-400">
-                  <button
-                    onClick={() => setSelectedColor('Off White')}
-                    className="w-7 h-7 rounded-full bg-[#EDE7DF] block border border-white shadow-xs focus:outline-none"
-                    title="Colour: Off White"
-                    aria-label="Colour: Off White"
-                  />
+                <div className="flex items-center gap-2.5">
+                  {colorVariants.map((v) => {
+                    const isSelected = selectedColor.toLowerCase() === v.color.toLowerCase();
+                    return (
+                      <div
+                        key={v.color}
+                        className={`p-0.5 rounded-full border transition-all ${
+                          isSelected ? 'border-[#4A0E17] scale-110 shadow-xs' : 'border-gray-300 hover:border-gray-500'
+                        }`}
+                      >
+                        <button
+                          onClick={() => handleColorChange(v.color)}
+                          className="w-7 h-7 rounded-full block border border-white shadow-xs focus:outline-none cursor-pointer"
+                          style={{ backgroundColor: v.colorHex }}
+                          title={`Colour: ${v.color}`}
+                          aria-label={`Colour: ${v.color}`}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
+                <span className="font-sans-clean text-xs text-[#4A0E17] font-semibold">{selectedColor}</span>
               </div>
             </div>
 
@@ -233,32 +324,37 @@ Mangesh Mahadev
               <div className="flex items-center gap-8 font-sans-clean text-xs tracking-wider">
                 
                 {/* Home Delivery Radio */}
-                <label className="flex items-center gap-2 cursor-pointer text-gray-900 font-medium">
-                  <span className="relative flex items-center justify-center w-4 h-4 rounded-full border border-[#997950]">
-                    <span className="w-2 h-2 rounded-full bg-[#997950]" />
+                <label className={`flex items-center gap-2 ${canHome ? 'cursor-pointer text-gray-900 font-medium' : 'cursor-not-allowed text-gray-300'}`}>
+                  <span className={`relative flex items-center justify-center w-4 h-4 rounded-full border ${deliveryMethod === 'home' && canHome ? 'border-[#997950]' : 'border-gray-300'}`}>
+                    {deliveryMethod === 'home' && canHome && <span className="w-2 h-2 rounded-full bg-[#997950]" />}
                   </span>
                   <input
                     type="radio"
                     name="deliveryMethod"
                     value="home"
-                    checked={deliveryMethod === 'home'}
-                    onChange={() => setDeliveryMethod('home')}
+                    disabled={!canHome}
+                    checked={deliveryMethod === 'home' && canHome}
+                    onChange={() => canHome && setDeliveryMethod('home')}
                     className="sr-only"
                   />
-                  <span>Home Delivery</span>
+                  <span>Home Delivery {!canHome && '(Unavailable)'}</span>
                 </label>
 
                 {/* Store Pick-up Radio */}
-                <label className="flex items-center gap-2 cursor-not-allowed text-gray-400">
-                  <span className="w-4 h-4 rounded-full border border-gray-300" />
+                <label className={`flex items-center gap-2 ${canPickup ? 'cursor-pointer text-gray-900 font-medium' : 'cursor-not-allowed text-gray-300'}`}>
+                  <span className={`relative flex items-center justify-center w-4 h-4 rounded-full border ${deliveryMethod === 'pickup' && canPickup ? 'border-[#997950]' : 'border-gray-300'}`}>
+                    {deliveryMethod === 'pickup' && canPickup && <span className="w-2 h-2 rounded-full bg-[#997950]" />}
+                  </span>
                   <input
                     type="radio"
                     name="deliveryMethod"
                     value="pickup"
-                    disabled
+                    disabled={!canPickup}
+                    checked={deliveryMethod === 'pickup' && canPickup}
+                    onChange={() => canPickup && setDeliveryMethod('pickup')}
                     className="sr-only"
                   />
-                  <span>Store Pick-up</span>
+                  <span>Store Pick-up {!canPickup && '(Unavailable)'}</span>
                 </label>
 
               </div>
@@ -307,47 +403,45 @@ Mangesh Mahadev
                   <div className="overflow-hidden space-y-2.5 font-sans-clean text-[11.5px] sm:text-xs leading-relaxed text-[#333333] tracking-wide">
                     <div className="grid grid-cols-12 gap-2">
                       <span className="col-span-4 sm:col-span-3 text-[#333333] font-medium">Style Number:</span>
-                      <span className="col-span-8 sm:col-span-9 font-normal text-[#333333]">F26MP8</span>
+                      <span className="col-span-8 sm:col-span-9 font-normal text-[#333333]">{product.styleNumber || product.sku || 'F26MP8'}</span>
                     </div>
 
                     <div className="grid grid-cols-12 gap-2">
                       <span className="col-span-4 sm:col-span-3 text-[#333333] font-medium">Measurements:</span>
-                      <span className="col-span-8 sm:col-span-9 font-normal text-[#333333]">
-                        Sherwani Length - 110 cm (43.3 In)<br />
-                        Churidar Fabric - 250 cm (2.5 Mtrs)<br />
-                        Draped Stole - 250 cm (2.5 Mtrs)
+                      <span className="col-span-8 sm:col-span-9 font-normal text-[#333333] whitespace-pre-line">
+                        {product.measurements || "Sherwani Length - 110 cm (43.3 In)\nChuridar Fabric - 250 cm (2.5 Mtrs)\nDraped Stole - 250 cm (2.5 Mtrs)"}
                       </span>
                     </div>
 
                     <div className="grid grid-cols-12 gap-2">
                       <span className="col-span-4 sm:col-span-3 text-[#333333] font-medium">Content:</span>
-                      <span className="col-span-8 sm:col-span-9 font-normal text-[#333333]">100% Silk + Lining : 100% Viscose</span>
+                      <span className="col-span-8 sm:col-span-9 font-normal text-[#333333]">{product.fabricContent || '100% Silk + Lining : 100% Viscose'}</span>
                     </div>
 
                     <div className="grid grid-cols-12 gap-2">
                       <span className="col-span-4 sm:col-span-3 text-[#333333] font-medium">No. of Components:</span>
-                      <span className="col-span-8 sm:col-span-9 font-normal text-[#333333]">3</span>
+                      <span className="col-span-8 sm:col-span-9 font-normal text-[#333333]">{product.componentsCount || 3}</span>
                     </div>
 
                     <div className="grid grid-cols-12 gap-2">
                       <span className="col-span-4 sm:col-span-3 text-[#333333] font-medium">Wash Care:</span>
-                      <span className="col-span-8 sm:col-span-9 font-normal text-[#333333]">Dry Clean / Spot Clean</span>
+                      <span className="col-span-8 sm:col-span-9 font-normal text-[#333333]">{product.washCare || 'Dry Clean / Spot Clean'}</span>
                     </div>
 
                     <div className="grid grid-cols-12 gap-2">
                       <span className="col-span-4 sm:col-span-3 text-[#333333] font-medium">Country of Origin:</span>
-                      <span className="col-span-8 sm:col-span-9 font-normal text-[#333333]">India</span>
+                      <span className="col-span-8 sm:col-span-9 font-normal text-[#333333]">{product.countryOfOrigin || 'India'}</span>
                     </div>
 
                     <div className="grid grid-cols-12 gap-2">
                       <span className="col-span-4 sm:col-span-3 text-[#333333] font-medium">Name and Address of Manufacturer:</span>
                       <span className="col-span-8 sm:col-span-9 font-normal text-[#333333]">
-                        House of Mangesh Mahadev Private Limited, Plot No R 847/1/1, TTC Ind. Area, MIDC, Rabale, Navi Mumbai, India - 400701.
+                        {product.manufacturerAddress || 'House of Mangesh Mahadev Private Limited, Plot No R 847/1/1, TTC Ind. Area, MIDC, Rabale, Navi Mumbai, India - 400701.'}
                       </span>
                     </div>
 
                     <div className="pt-2 text-[#333333] italic font-serif-story text-[13.5px]">
-                      Set Includes: Hand-embroidered Sherwani, Churidar Fabric & Handcrafted Silk Stole
+                      Set Includes: {product.setIncludes || 'Hand-embroidered Sherwani, Churidar Fabric & Handcrafted Silk Stole'}
                     </div>
                   </div>
                 </div>
@@ -486,7 +580,7 @@ Mangesh Mahadev
                 >
                   <div className="overflow-hidden space-y-2 font-sans-clean text-[11.5px] text-[#333333] tracking-wide">
                     <p className="text-[#333333]">
-                      This item is not eligible for return or exchange. <span className="text-[#333333] underline cursor-pointer font-medium">More Info</span>
+                      {product.returnsPolicy || 'This item is not eligible for return or exchange.'} <span className="text-[#333333] underline cursor-pointer font-medium">More Info</span>
                     </p>
                     <a
                       href="#returns-policy"
@@ -526,7 +620,7 @@ Mangesh Mahadev
                 >
                   <div className="overflow-hidden font-serif-story text-[13.5px] leading-relaxed text-[#333333]">
                     <p>
-                      The colour of the product may vary slightly from how it appears here. This may be due to different display settings on various devices and also because of any lighting filters or special effects used during the shoot.
+                      {product.disclaimer || 'The colour of the product may vary slightly from how it appears here. This may be due to different display settings on various devices and also because of any lighting filters or special effects used during the shoot.'}
                     </p>
                   </div>
                 </div>
@@ -564,11 +658,11 @@ Mangesh Mahadev
                     className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
                   />
                 </div>
-                <h3 className="font-serif-luxury text-sm tracking-[0.10em] text-[#333333] uppercase group-hover:text-[#4A0E17] transition-colors truncate font-normal">
+                <h3 className="font-serif-luxury text-[13px] tracking-[0.08em] text-[#333333] uppercase group-hover:text-[#4A0E17] transition-colors font-normal w-full h-[18px] overflow-hidden text-ellipsis whitespace-nowrap" title={rel.title}>
                   {rel.title}
                 </h3>
                 <p className="font-sans-clean text-xs text-[#333333] font-medium mt-1">
-                  ₹{(rel.price * 86.5).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  ₹{rel.price.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                 </p>
               </a>
             ))}

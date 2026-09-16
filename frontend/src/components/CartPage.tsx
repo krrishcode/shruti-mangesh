@@ -8,10 +8,8 @@ export const CartPage: React.FC = () => {
   const shipping = 0;
   const total = subtotal + shipping;
 
-  const formatINR = (usd: number) =>
-    `₹${Math.round(usd * 86.5).toLocaleString('en-IN')}`;
-  const formatUSD = (usd: number) =>
-    `$${usd.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+  const formatINR = (amount: number) =>
+    `₹${Math.round(amount).toLocaleString('en-IN')}`;
 
   return (
     <main className="bg-[#FAF8F5] min-h-screen pt-4 pb-16 text-[#333333]">
@@ -102,9 +100,6 @@ export const CartPage: React.FC = () => {
                       <div className="text-right">
                         <p className="font-serif-luxury text-lg text-[#333333] font-normal tracking-wider">
                           {formatINR(item.price * item.quantity)}
-                        </p>
-                        <p className="font-sans-clean text-[10.5px] text-gray-500 font-light">
-                          ({formatUSD(item.price * item.quantity)} USD)
                         </p>
                       </div>
                     </div>

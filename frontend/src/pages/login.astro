@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { HeaderInteractive } from '../components/HeaderInteractive';
+import Footer from '../components/Footer.astro';
+import { LoginPage } from '../react/auth/pages/LoginPage';
+---
+<Layout title="Login | Mangesh Mahadev">
+  <HeaderInteractive client:load />
+  <LoginPage client:load />
+  <Footer />
+</Layout>

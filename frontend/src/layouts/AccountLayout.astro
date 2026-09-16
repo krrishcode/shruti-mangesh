@@ -1,0 +1,32 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'My Account | MANGESH MAHADEV',
+  description = 'Your private atelier portal at Mangesh Mahadev — orders, bespoke appointments, profile and address book.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth bg-[#FAFAF9]">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex" />
+    <title>{title}</title>
+
+    <style is:global>
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
+    </style>
+  </head>
+  <body class="bg-[#FAFAF9] text-[#1C1917] antialiased selection:bg-[#4A0E17] selection:text-white min-h-screen">
+    <slot />
+  </body>
+</html>

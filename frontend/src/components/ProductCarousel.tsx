@@ -87,12 +87,12 @@ export const ProductCarousel: React.FC = () => {
               {/* Text Typography Below Image Exactly Like Screenshot */}
               <div className="text-left">
                 <a href={`/products/${prod.id}`}>
-                  <h3 className="font-serif-luxury text-sm sm:text-[15px] tracking-[0.10em] text-[#333333] uppercase truncate font-normal hover:text-[#4A0E17] transition-colors">
+                  <h3 className="font-serif-luxury text-[13px] tracking-[0.08em] text-[#333333] uppercase font-normal hover:text-[#4A0E17] transition-colors w-full h-[18px] overflow-hidden text-ellipsis whitespace-nowrap" title={prod.title}>
                     {prod.title}
                   </h3>
                 </a>
                 <p className="font-sans-clean text-[11px] sm:text-xs text-[#444444] mt-1 font-light tracking-wider">
-                  ₹{(prod.price * 86.5).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  ₹{prod.price.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                 </p>
               </div>
             </div>
@@ -144,10 +144,7 @@ export const ProductCarousel: React.FC = () => {
                   {selectedProduct.title}
                 </h2>
                 <p className="text-base font-semibold text-[#4A0E17] mb-4">
-                  ₹{(selectedProduct.price * 86.5).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  <span className="text-xs text-gray-400 ml-2 font-normal">
-                    (${selectedProduct.price.toLocaleString()} USD)
-                  </span>
+                  ₹{selectedProduct.price.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                 </p>
 
                 <p className="text-xs text-gray-600 leading-relaxed mb-6 font-light">

@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
+import { serveStatic } from '@hono/node-server/serve-static';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { env } from './config/index.js';
@@ -22,6 +23,8 @@ import { shippingModule } from './modules/shipping/index.js';
 import { reviewsModule } from './modules/reviews/index.js';
 import { wishlistModule } from './modules/wishlist/index.js';
 import { mediaModule } from './modules/media/index.js';
+import { appointmentsModule } from './modules/appointments/index.js';
+import { adminModule } from './modules/admin/index.js';
 
 export const app = new Hono();
 
@@ -31,10 +34,13 @@ app.use(
   '*',
   cors({
     origin: env.corsOrigin,
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
   })
 );
+
+// Serve static uploaded media files
+app.use('/uploads/*', serveStatic({ root: './' }));
 
 app.onError(errorHandler);
 
@@ -65,6 +71,8 @@ app.route('/api/shipping', shippingModule);
 app.route('/api/reviews', reviewsModule);
 app.route('/api/wishlist', wishlistModule);
 app.route('/api/media', mediaModule);
+app.route('/api/appointments', appointmentsModule);
+app.route('/api/admin', adminModule);
 
 console.log(`🚀 Hono backend running on http://localhost:${env.port}`);
 

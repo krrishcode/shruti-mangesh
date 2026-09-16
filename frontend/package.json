@@ -10,9 +10,6 @@
   },
   "dependencies": {
     "@astrojs/react": "^4.2.1",
-    "@ecommerce/config": "workspace:*",
-    "@ecommerce/types": "workspace:*",
-    "@ecommerce/validation": "workspace:*",
     "@tailwindcss/vite": "^4.0.0",
     "astro": "^5.0.0",
     "react": "^19.0.0",

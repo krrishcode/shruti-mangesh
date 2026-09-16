@@ -1,0 +1,17 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { HeaderInteractive } from '../../components/HeaderInteractive';
+import Footer from '../../components/Footer.astro';
+import { UserPortalLayout } from '../../react/user/components/UserPortalLayout';
+import { OrdersView } from '../../react/user/components/views/OrdersView';
+---
+
+<Layout title="Order History | Mangesh Mahadev">
+  <HeaderInteractive client:load />
+  <main class="bg-[#FAF8F5] min-h-screen pt-8 pb-20">
+    <UserPortalLayout activeTab="orders" client:load>
+      <OrdersView client:load />
+    </UserPortalLayout>
+  </main>
+  <Footer />
+</Layout>

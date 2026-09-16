@@ -79,7 +79,7 @@ export const CelebsShowcase: React.FC = () => {
               </div>
 
               {/* Minimal Text Below Image */}
-              <h3 className="font-serif-luxury text-sm sm:text-base tracking-[0.12em] font-normal text-[#333333] uppercase group-hover:text-[#4A0E17] transition-colors truncate">
+              <h3 className="font-serif-luxury text-[13px] tracking-[0.08em] font-normal text-[#333333] uppercase group-hover:text-[#4A0E17] transition-colors w-full h-[18px] overflow-hidden text-ellipsis whitespace-nowrap" title={celeb.celebName}>
                 {celeb.celebName}
               </h3>
               <p className="font-sans-clean text-[10px] sm:text-[11px] text-[#333333] tracking-[0.06em] mt-1 font-light normal-case">
